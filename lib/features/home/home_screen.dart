@@ -1,7 +1,8 @@
 import 'package:bluetooth_connectivity/core/bluetooth/bluetooth_service.dart';
 import 'package:bluetooth_connectivity/features/discovery/discovery_screen.dart'; // We will create this next
 import 'package:flutter/material.dart';
-import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
+// import 'package:flutter_bluetooth_classic_serial/flutter_bluetooth_classic.dart';
+import 'package:bluetooth_connectivity/core/bluetooth/flutter_bluetooth_classic_fixed.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -44,8 +45,10 @@ class _HomeScreenState extends State<HomeScreen> {
               initialData: _bluetoothService.state,
               builder: (context, snapshot) {
                 final state = snapshot.data;
+                final isEnabled = state?.isEnabled ?? false;
+                final status = state?.status ?? "Unknown";
                 return Text(
-                  "Bluetooth: ${state.toString().split('.')[1]}",
+                  "Bluetooth: ${isEnabled ? "ON ($status)" : "OFF ($status)"}",
                   style: Theme.of(context).textTheme.bodyLarge,
                 );
               },

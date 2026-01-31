@@ -1,7 +1,8 @@
 import 'package:bluetooth_connectivity/core/bluetooth/bluetooth_service.dart';
 import 'package:bluetooth_connectivity/features/chat/chat_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
+// import 'package:flutter_bluetooth_classic_serial/flutter_bluetooth_classic.dart';
+import 'package:bluetooth_connectivity/core/bluetooth/flutter_bluetooth_classic_fixed.dart';
 
 class DiscoveryScreen extends StatefulWidget {
   final bool isServer;
@@ -21,11 +22,24 @@ class _DiscoveryScreenState extends State<DiscoveryScreen> {
     super.initState();
     // Only Scan if Client (User Chose "Find Devices")
     if (!widget.isServer) {
-      _loadBondedDevices();
-      _bluetoothService.startDiscovery();
+      _requestPermissionsAndStart();
     } else {
       // Server Logic: User Chose "Make Discoverable"
       _startServer();
+    }
+  }
+
+  Future<void> _requestPermissionsAndStart() async {
+    bool granted = await _bluetoothService.requestPermissions();
+    if (granted) {
+      _loadBondedDevices();
+      _bluetoothService.startDiscovery();
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Bluetooth permissions denied")),
+        );
+      }
     }
   }
 
@@ -50,6 +64,7 @@ class _DiscoveryScreenState extends State<DiscoveryScreen> {
         final dummyDevice = BluetoothDevice(
           address: "Client",
           name: "Client Device",
+          paired: false,
         );
 
         Navigator.pushReplacement(
@@ -130,7 +145,7 @@ class _DiscoveryScreenState extends State<DiscoveryScreen> {
                 },
               ),
             )
-          : StreamBuilder<List<BluetoothDiscoveryResult>>(
+          : StreamBuilder<List<BluetoothDevice>>(
               stream: _bluetoothService.discoveryResultsStream,
               initialData: const [],
               builder: (context, snapshot) {
@@ -173,12 +188,12 @@ class _DiscoveryScreenState extends State<DiscoveryScreen> {
                       ),
 
                     ...discoveredResults.map(
-                      (result) => ListTile(
+                      (device) => ListTile(
                         leading: const Icon(Icons.bluetooth),
-                        title: Text(result.device.name ?? "Unknown Device"),
-                        subtitle: Text(result.device.address),
-                        trailing: Text("${result.rssi} dBm"),
-                        onTap: () => _connect(result.device),
+                        title: Text(device.name ?? "Unknown Device"),
+                        subtitle: Text(device.address),
+                        // trailing: Text("${result.rssi} dBm"), // RSSI not available in BluetoothDevice
+                        onTap: () => _connect(device),
                       ),
                     ),
                   ],

@@ -3,7 +3,8 @@ import 'package:bluetooth_connectivity/core/bluetooth/bluetooth_service.dart';
 import 'package:bluetooth_connectivity/core/models/message_model.dart';
 import 'package:bluetooth_connectivity/core/theme/app_theme.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
+// import 'package:flutter_bluetooth_classic_serial/flutter_bluetooth_classic.dart';
+import 'package:bluetooth_connectivity/core/bluetooth/flutter_bluetooth_classic_fixed.dart';
 import 'package:intl/intl.dart';
 
 class ChatScreen extends StatefulWidget {
